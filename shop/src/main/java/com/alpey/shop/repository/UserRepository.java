@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import com.alpey.shop.entity.User;
 
 @Repository
-public interface UserInterface extends CrudRepository<User, Long> {
+public interface UserRepository extends CrudRepository<User, Long> {
 	
 	public User findByUsername(String username);
 	public User findByEmail(String email);

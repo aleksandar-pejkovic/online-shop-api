@@ -5,51 +5,53 @@ import java.util.List;
 import javax.persistence.EntityExistsException;
 import javax.persistence.EntityNotFoundException;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.alpey.shop.entity.Admin;
-import com.alpey.shop.repository.AdminRepository;
+import com.alpey.shop.entity.User;
+import com.alpey.shop.repository.UserRepository;
 
 @Service
-public class AdminService {
+public class UserService {
 
 	@Autowired
-	AdminRepository adminRepository;
-
-	public Admin create(Admin admin) {
+	UserRepository userRepository;
+	
+	public User create(User user) {
 		try {
-			return adminRepository.save(admin);
+			return userRepository.save(user);
 		} catch (EntityExistsException e) {
 			return null;
 		}
 	}
 
-	public Admin update(String oldUsername, Admin updatedAdmin) {
+	public User update(String oldUsername, User updatedUser) {
 		try {
-			Admin storedAdmin = adminRepository.findByUsername(oldUsername);
-			copyNotNullProperties(updatedAdmin, storedAdmin);
-			return adminRepository.save(storedAdmin);
+			User storedUser = userRepository.findByUsername(oldUsername);
+			copyNotNullProperties(updatedUser, storedUser);
+			return userRepository.save(storedUser);
 		} catch (EntityNotFoundException e) {
 			return null;
 		}
 	}
 
-	public List<Admin> findAll() {
-		return (List<Admin>) adminRepository.findAll();
+	public List<User> findAll() {
+		return (List<User>) userRepository.findAll();
 	}
 
-	public Admin findByUsername(String username) {
+	public User findByUsername(String username) {
 		try {
-			return adminRepository.findByUsername(username);
+			return userRepository.findByUsername(username);
 		} catch (EntityNotFoundException e) {
 			return null;
 		}
 	}
 
-	public Admin findByEmail(String email) {
+	public User findByEmail(String email) {
 		try {
-			return adminRepository.findByEmail(email);
+			return userRepository.findByEmail(email);
 		} catch (EntityNotFoundException e) {
 			return null;
 		}
@@ -57,28 +59,24 @@ public class AdminService {
 
 	public String delete(String username) {
 		try {
-			Admin admin = adminRepository.findByUsername(username);
-			adminRepository.delete(admin);
-			return "Admin " + username + " deleted!";
+			User user = userRepository.findByUsername(username);
+			userRepository.delete(user);
+			return "User " + username + " deleted!";
 		} catch (EntityNotFoundException e) {
-			return "Admin " + username + " doesn't exist!";
+			return "User " + username + " doesn't exist!";
 		}
 	}
 
-	public String changeMasterPassword(String oldMasterPassword, String newMasterPassword) {
-		return Admin.changeMasterPassword(oldMasterPassword, newMasterPassword);
-	}
-
 	public boolean loginValidation(String username, String password) {
-		Admin admin = findByUsername(username);
-		if (admin != null) {
-			return admin.getPassword().equals(password);
+		User user = findByUsername(username);
+		if (user != null) {
+			return user.getPassword().equals(password);
 		} else {
 			return false;
 		}
 	}
 	
-	public Admin copyNotNullProperties(Admin src, Admin dest) {
+	public User copyNotNullProperties(User src, User dest) {
 		String username = src.getUsername();
 		String password = src.getPassword();
 		String email = src.getEmail();
@@ -100,5 +98,5 @@ public class AdminService {
 			return true;
 		}
 	}
-
+	
 }
