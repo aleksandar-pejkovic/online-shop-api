@@ -18,7 +18,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Item {
-	
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
@@ -32,7 +32,14 @@ public class Item {
 	private double vat;
 	private double totalBeforeTax;
 	private double total;
-	
+
+	public Item(Order order, double amount, Product product) {
+		this.order = order;
+		this.amount = amount;
+		this.product = product;
+		calculateTotal();
+	}
+
 	public double calculateTotal() {
 		this.vat = Math.round(this.amount * this.product.getVat() * 100.0 / 100.0);
 		this.totalBeforeTax = Math.round(this.amount * this.product.getPriceBeforeTax() * 100.0 / 100.0);

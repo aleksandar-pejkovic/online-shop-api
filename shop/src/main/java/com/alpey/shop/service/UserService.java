@@ -5,11 +5,9 @@ import java.util.List;
 import javax.persistence.EntityExistsException;
 import javax.persistence.EntityNotFoundException;
 
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.alpey.shop.entity.Admin;
 import com.alpey.shop.entity.User;
 import com.alpey.shop.repository.UserRepository;
 

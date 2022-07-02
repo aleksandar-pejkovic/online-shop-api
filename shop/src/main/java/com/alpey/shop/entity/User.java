@@ -7,7 +7,9 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -33,9 +35,9 @@ public class User {
 	private String email;
 	private String firstName;
 	private String lastName;
-	private String address;
-	private String zip;
-	private String city;
+	@OneToOne
+	@JoinColumn(name = "address_id")
+	private Address address;
 	@Column(unique = true)
 	private String phone;
 	@JsonIgnore

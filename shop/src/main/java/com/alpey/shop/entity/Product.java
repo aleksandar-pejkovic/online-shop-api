@@ -32,15 +32,24 @@ public class Product {
 	private String name;
 	private String unit;
 	private double vatPercentage;
-	private double vat;	//value added tax
+	private double vat; // value added tax
 	private double priceBeforeTax;
 	private double price;
 	@JsonIgnore
 	@OneToMany(mappedBy = "product")
 	private List<Item> items;
 
+	public Product(String barcode, String name, String unit, double vatPercentage, double price) {
+		this.barcode = barcode;
+		this.name = name;
+		this.unit = unit;
+		this.vatPercentage = vatPercentage;
+		this.price = price;
+		calculateVAT();
+	}
+
 	public double calculateVAT() {
-		double recalculatedPercentage = (this.vatPercentage * 100) / (this.vatPercentage + 100) / 100; //a coefficient used for calculating VAT in full price
+		double recalculatedPercentage = (this.vatPercentage * 100) / (this.vatPercentage + 100) / 100; // a coefficient																							// price
 		this.vat = Math.round((this.price * recalculatedPercentage) * 100.0 / 100.0);
 		this.priceBeforeTax = this.price - this.vat;
 		return this.vat;
