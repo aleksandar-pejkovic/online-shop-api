@@ -56,7 +56,7 @@ public class OrderService {
 	}
 	
 	public List<Order> findByDate(LocalDate date){
-		return orderRepository.findByDate(date);
+		return orderRepository.findByOrderDate(date);
 	}
 	
 	public List<Order> findAll(){

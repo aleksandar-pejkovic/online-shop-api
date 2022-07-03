@@ -55,6 +55,14 @@ public class UserService {
 			return null;
 		}
 	}
+	
+	public List<User> findByCity(String city) {
+		try {
+			return userRepository.findByCity(city);
+		} catch (EntityNotFoundException e) {
+			return null;
+		}
+	}
 
 	public String delete(String username) {
 		try {

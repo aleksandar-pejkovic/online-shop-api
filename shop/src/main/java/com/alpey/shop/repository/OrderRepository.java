@@ -14,6 +14,6 @@ public interface OrderRepository extends CrudRepository<Order, Long> {
 	
 	public Order findByOrderNumber(long orderNumber);
 	public List<Order> findByUser(User user);
-	public List<Order> findByDate(LocalDate orderDate);
+	public List<Order> findByOrderDate(LocalDate orderDate);
 
 }
