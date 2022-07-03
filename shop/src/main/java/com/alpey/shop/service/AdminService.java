@@ -5,6 +5,7 @@ import java.util.List;
 import javax.persistence.EntityExistsException;
 import javax.persistence.EntityNotFoundException;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,10 +26,10 @@ public class AdminService {
 		}
 	}
 
-	public Admin update(String oldUsername, Admin updatedAdmin) {
+	public Admin update(Admin admin, String oldName) {
 		try {
-			Admin storedAdmin = adminRepository.findByUsername(oldUsername);
-			copyNotNullProperties(updatedAdmin, storedAdmin);
+			Admin storedAdmin = adminRepository.findByUsername(oldName);
+			BeanUtils.copyProperties(admin, storedAdmin, "id");
 			return adminRepository.save(storedAdmin);
 		} catch (EntityNotFoundException e) {
 			return null;
@@ -69,36 +70,32 @@ public class AdminService {
 		return Admin.changeMasterPassword(oldMasterPassword, newMasterPassword);
 	}
 
-	public boolean loginValidation(String username, String password) {
-		Admin admin = findByUsername(username);
-		if (admin != null) {
-			return admin.getPassword().equals(password);
-		} else {
-			return false;
+	public Admin loginValidation(String username, String password) {
+
+		try {
+			Admin admin = adminRepository.findByUsername(username);
+			if (admin.getPassword().equals(password)) {
+				return admin;
+			} else {
+				return null;
+			}
+		} catch (EntityNotFoundException e) {
+			return null;
 		}
 	}
-	
-	public Admin copyNotNullProperties(Admin src, Admin dest) {
-		String username = src.getUsername();
-		String password = src.getPassword();
-		String email = src.getEmail();
-		
-		if(hasValue(username))
-			dest.setUsername(username);
-		if(hasValue(password))
-			dest.setPassword(password);
-		if(hasValue(email))
-			dest.setEmail(email);
-		
-		return dest;
-	}
-	
-	public boolean hasValue(String str) {
-		if(str.equals("") || str.equals(null)) {
-			return false;
-		} else {
-			return true;
-		}
-	}
+
+	/*
+	 * public Admin copyNotNullProperties(Admin src, Admin dest) { String username =
+	 * src.getUsername(); String password = src.getPassword(); String email =
+	 * src.getEmail();
+	 * 
+	 * if (hasValue(username)) dest.setUsername(username); if (hasValue(password))
+	 * dest.setPassword(password); if (hasValue(email)) dest.setEmail(email);
+	 * 
+	 * return dest; }
+	 * 
+	 * public boolean hasValue(String str) { if (str.equals("") || str.equals(null))
+	 * { return false; } else { return true; } }
+	 */
 
 }

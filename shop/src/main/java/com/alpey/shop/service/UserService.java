@@ -5,6 +5,7 @@ import java.util.List;
 import javax.persistence.EntityExistsException;
 import javax.persistence.EntityNotFoundException;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,10 +26,10 @@ public class UserService {
 		}
 	}
 
-	public User update(String oldUsername, User updatedUser) {
+	public User update(User user, String oldName) {
 		try {
-			User storedUser = userRepository.findByUsername(oldUsername);
-			copyNotNullProperties(updatedUser, storedUser);
+			User storedUser = userRepository.findByUsername(oldName);
+			BeanUtils.copyProperties(user, storedUser, "id");
 			return userRepository.save(storedUser);
 		} catch (EntityNotFoundException e) {
 			return null;
@@ -65,15 +66,21 @@ public class UserService {
 		}
 	}
 
-	public boolean loginValidation(String username, String password) {
-		User user = findByUsername(username);
-		if (user != null) {
-			return user.getPassword().equals(password);
-		} else {
-			return false;
+	public User loginValidation(String username, String password) {
+		
+		try {
+			User user = findByUsername(username);
+			if (user.getPassword().equals(password)) {
+				return user;
+			} else {
+				return null;
+			}
+		} catch (EntityNotFoundException e) {
+			return null;
 		}
 	}
 	
+	/*
 	public User copyNotNullProperties(User src, User dest) {
 		String username = src.getUsername();
 		String password = src.getPassword();
@@ -96,5 +103,6 @@ public class UserService {
 			return true;
 		}
 	}
+	*/
 	
 }
