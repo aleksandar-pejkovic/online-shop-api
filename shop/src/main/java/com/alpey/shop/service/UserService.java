@@ -26,7 +26,7 @@ public class UserService {
 			User user = parseUser(userRequest);
 			User storedUser = userRepository.save(user);
 			return parseUserResponse(storedUser);
-		} catch (EntityExistsException | NullPointerException e) {
+		} catch (EntityExistsException | NullPointerException | IllegalArgumentException e) {
 			return new UserResponse();
 		}
 	}
@@ -36,7 +36,7 @@ public class UserService {
 			User storedUser = parseUser(user, oldName);
 			storedUser = userRepository.save(storedUser);
 			return parseUserResponse(storedUser);
-		} catch (EntityNotFoundException | NullPointerException e) {
+		} catch (EntityNotFoundException | NullPointerException | IllegalArgumentException e) {
 			return new UserResponse();
 		}
 	}
@@ -50,7 +50,7 @@ public class UserService {
 		try {
 			User user = userRepository.findByUsername(username);
 			return parseUserResponse(user);
-		} catch (EntityNotFoundException | NullPointerException e) {
+		} catch (EntityNotFoundException | NullPointerException | IllegalArgumentException e) {
 			return new UserResponse();
 		}
 	}
@@ -59,7 +59,7 @@ public class UserService {
 		try {
 			User user = userRepository.findByEmail(email);
 			return parseUserResponse(user);
-		} catch (EntityNotFoundException | NullPointerException e) {
+		} catch (EntityNotFoundException | NullPointerException | IllegalArgumentException e) {
 			return new UserResponse();
 		}
 	}
@@ -68,7 +68,7 @@ public class UserService {
 		try {
 			List<User> users = userRepository.findByCity(city);
 			return parseUserResponse(users);
-		} catch (EntityNotFoundException | NullPointerException e) {
+		} catch (EntityNotFoundException | NullPointerException | IllegalArgumentException e) {
 			return new ArrayList<UserResponse>();
 		}
 	}
@@ -77,7 +77,7 @@ public class UserService {
 		try {
 			User user = userRepository.findByPhone(phone);
 			return parseUserResponse(user);
-		} catch (EntityNotFoundException | NullPointerException e) {
+		} catch (EntityNotFoundException | NullPointerException | IllegalArgumentException e) {
 			return new UserResponse();
 		}
 	}
@@ -87,7 +87,7 @@ public class UserService {
 			User user = userRepository.findByUsername(username);
 			userRepository.delete(user);
 			return "User " + username + " deleted!";
-		} catch (EntityNotFoundException | NullPointerException e) {
+		} catch (EntityNotFoundException | NullPointerException | IllegalArgumentException e) {
 			return "User " + username + " doesn't exist!";
 		}
 	}
@@ -101,7 +101,7 @@ public class UserService {
 			} else {
 				return new UserResponse();
 			}
-		} catch (EntityNotFoundException | NullPointerException e) {
+		} catch (EntityNotFoundException | NullPointerException | IllegalArgumentException e) {
 			return new UserResponse();
 		}
 	}
@@ -128,7 +128,7 @@ public class UserService {
 
 	private User parseUser(UserRequest userRequest, String oldUsername) {
 		User storedUser = userRepository.findByUsername(oldUsername);
-		BeanUtils.copyProperties(oldUsername, storedUser);
+		BeanUtils.copyProperties(userRequest, storedUser);
 		return storedUser;
 	}
 

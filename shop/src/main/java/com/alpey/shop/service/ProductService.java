@@ -26,7 +26,7 @@ public class ProductService {
 		try {
 			Product storedProduct = productRepository.save(parseProduct(productRequest));
 			return parseProductResponse(storedProduct);
-		} catch (EntityExistsException e) {
+		} catch (EntityExistsException | IllegalArgumentException | NullPointerException e) {
 			return null;
 		}
 	}
@@ -37,7 +37,7 @@ public class ProductService {
 			BeanUtils.copyProperties(productRequest, storedProduct);
 			storedProduct = productRepository.save(storedProduct);
 			return parseProductResponse(storedProduct);
-		} catch (EntityNotFoundException | NullPointerException e) {
+		} catch (EntityNotFoundException | NullPointerException | IllegalArgumentException e) {
 			return new ProductResponse();
 		}
 	}
@@ -46,7 +46,7 @@ public class ProductService {
 		try {
 			Product product = productRepository.findByName(name);
 			return parseProductResponse(product);
-		} catch (EntityNotFoundException | NullPointerException e) {
+		} catch (EntityNotFoundException | NullPointerException | IllegalArgumentException e) {
 			return new ProductResponse();
 		}
 	}
@@ -55,7 +55,7 @@ public class ProductService {
 		try {
 			Product product = productRepository.findByBarcode(barcode);
 			return parseProductResponse(product);
-		} catch (EntityNotFoundException | NullPointerException e) {
+		} catch (EntityNotFoundException | NullPointerException | IllegalArgumentException e) {
 			return new ProductResponse();
 		}
 	}
@@ -82,7 +82,7 @@ public class ProductService {
 				shortlist = productRepository.findByPrice(price);
 			}
 			return parseProductResponse(shortlist);
-		} catch (EntityNotFoundException | NullPointerException e) {
+		} catch (EntityNotFoundException | NullPointerException | IllegalArgumentException e) {
 			return new ArrayList<ProductResponse>();
 		}
 	}
@@ -92,7 +92,7 @@ public class ProductService {
 			Product product = productRepository.findByName(name);
 			productRepository.delete(product);
 			return "Product " + name + " deleted!";
-		} catch (EntityNotFoundException | NullPointerException e) {
+		} catch (EntityNotFoundException | NullPointerException | IllegalArgumentException e) {
 			return "Product " + name + " doesn't exist!";
 		}
 	}

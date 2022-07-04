@@ -36,7 +36,7 @@ public class ItemService {
 			Item item = parseItem(itemRequest);
 			Item storedItem = itemRepository.save(item);
 			return parseItemResponse(storedItem);
-		} catch (EntityExistsException | NullPointerException e) {
+		} catch (EntityExistsException | NullPointerException | IllegalArgumentException e) {
 			return new ItemResponse();
 		}
 	}
@@ -53,7 +53,7 @@ public class ItemService {
 			Order order = orderRepository.findByOrderNumber(orderNumber);
 			List<Item> items = itemRepository.findByOrder(order);
 			return parseItemResponse(items);
-		} catch (EntityNotFoundException | NullPointerException e) {
+		} catch (EntityNotFoundException | NullPointerException | IllegalArgumentException e) {
 			return new ArrayList<ItemResponse>();
 		}
 	}
@@ -65,7 +65,7 @@ public class ItemService {
 			order.removeItem(item);
 			itemRepository.delete(item);
 			return "Item deleted!";
-		} catch (EntityNotFoundException | NullPointerException e) {
+		} catch (EntityNotFoundException | NullPointerException | IllegalArgumentException e) {
 			return "Item not found!";
 		}
 	}

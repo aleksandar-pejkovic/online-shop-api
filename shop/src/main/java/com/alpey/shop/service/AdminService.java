@@ -26,7 +26,7 @@ public class AdminService {
 			Admin admin = parseAdmin(adminRequest);
 			Admin storedAdmin = adminRepository.save(admin);
 			return parseAdminResponse(storedAdmin);
-		} catch (EntityExistsException | NullPointerException e) {
+		} catch (EntityExistsException | NullPointerException | IllegalArgumentException e) {
 			return new AdminResponse();
 		}
 	}
@@ -36,7 +36,7 @@ public class AdminService {
 			Admin storedAdmin = parseAdmin(adminRequest, oldUsername);
 			Admin updatedAdmin = adminRepository.save(storedAdmin);
 			return parseAdminResponse(updatedAdmin);
-		} catch (EntityNotFoundException | NullPointerException e) {
+		} catch (EntityNotFoundException | NullPointerException | IllegalArgumentException e) {
 			return new AdminResponse();
 		}
 	}
@@ -50,7 +50,7 @@ public class AdminService {
 		try {
 			Admin admin = adminRepository.findByUsername(username);
 			return parseAdminResponse(admin);
-		} catch (EntityNotFoundException | NullPointerException e) {
+		} catch (EntityNotFoundException | NullPointerException | IllegalArgumentException e) {
 			return new AdminResponse();
 		}
 	}
@@ -59,7 +59,7 @@ public class AdminService {
 		try {
 			Admin admin = adminRepository.findByEmail(email);
 			return parseAdminResponse(admin);
-		} catch (EntityNotFoundException | NullPointerException e) {
+		} catch (EntityNotFoundException | NullPointerException | IllegalArgumentException e) {
 			return new AdminResponse();
 		}
 	}
@@ -69,7 +69,7 @@ public class AdminService {
 			Admin admin = adminRepository.findByUsername(username);
 			adminRepository.delete(admin);
 			return "Admin " + username + " deleted!";
-		} catch (EntityNotFoundException | NullPointerException e) {
+		} catch (EntityNotFoundException | NullPointerException | IllegalArgumentException e) {
 			return "Admin " + username + " doesn't exist!";
 		}
 	}
@@ -77,7 +77,7 @@ public class AdminService {
 	public String changeMasterPassword(String oldMasterPassword, String newMasterPassword) {
 		try {
 			return Admin.changeMasterPassword(oldMasterPassword, newMasterPassword);
-		} catch (NullPointerException e) {
+		} catch (NullPointerException | IllegalArgumentException e) {
 			return "Input can't be null!";
 		}
 	}
@@ -91,7 +91,7 @@ public class AdminService {
 			} else {
 				return new AdminResponse();
 			}
-		} catch (EntityNotFoundException | NullPointerException e) {
+		} catch (EntityNotFoundException | NullPointerException | IllegalArgumentException e) {
 			return new AdminResponse();
 		}
 	}

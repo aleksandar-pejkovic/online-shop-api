@@ -32,7 +32,7 @@ public class OrderService {
 			Order order = parseOrder(orderRequest);
 			Order storedOrder = orderRepository.save(order);
 			return parseOrderResponse(storedOrder);
-		} catch (EntityExistsException | NullPointerException e) {
+		} catch (EntityExistsException | NullPointerException | IllegalArgumentException e) {
 			return new OrderResponse();
 		}
 	}
@@ -42,7 +42,7 @@ public class OrderService {
 			Order storedOrder = parseOrder(orderRequest, orderNumber);
 			storedOrder = orderRepository.save(storedOrder);
 			return parseOrderResponse(storedOrder);
-		} catch (EntityNotFoundException | NullPointerException e) {
+		} catch (EntityNotFoundException | NullPointerException | IllegalArgumentException e) {
 			return new OrderResponse();
 		}
 	}
@@ -51,7 +51,7 @@ public class OrderService {
 		try {
 			Order order = orderRepository.findByOrderNumber(orderNumber);
 			return parseOrderResponse(order);
-		} catch (EntityNotFoundException | NullPointerException e) {
+		} catch (EntityNotFoundException | NullPointerException | IllegalArgumentException e) {
 			return new OrderResponse();
 		}
 	}
@@ -61,7 +61,7 @@ public class OrderService {
 			User user = userRepository.findByUsername(username);
 			List<Order> orders = orderRepository.findByUser(user);
 			return parseOrderResponse(orders);
-		} catch (EntityNotFoundException | NullPointerException e) {
+		} catch (EntityNotFoundException | NullPointerException | IllegalArgumentException e) {
 			return new ArrayList<OrderResponse>();
 		}
 	}
@@ -70,7 +70,7 @@ public class OrderService {
 		try {
 			List<Order> orders = orderRepository.findByOrderDate(date);
 			return parseOrderResponse(orders);
-		} catch (EntityNotFoundException | NullPointerException e) {
+		} catch (EntityNotFoundException | NullPointerException | IllegalArgumentException e) {
 			return new ArrayList<OrderResponse>();
 		}
 	}
@@ -85,7 +85,7 @@ public class OrderService {
 			Order order = orderRepository.findByOrderNumber(orderNumber);
 			orderRepository.delete(order);
 			return "Order " + orderNumber + " deleted!";
-		} catch (EntityNotFoundException | NullPointerException e) {
+		} catch (EntityNotFoundException | NullPointerException | IllegalArgumentException e) {
 			return "Order not found!";
 		}
 	}
