@@ -1,4 +1,4 @@
-package com.alpey.shop.request;
+package com.alpey.shop.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,10 +9,15 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-public class AdminRequest {
-	
-	private String username;
-	private String password;
-	private String email;
+public class UserResponse {
 
+	private String username;
+	private String email;
+	private String firstName;
+	private String lastName;
+	private String street;
+	private String zip;
+	private String city;
+	private String phone;
+	
 }

@@ -32,7 +32,7 @@ public class Order {
 	private Long id;
 	@Column(unique = true)
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	private long orderNumber;
+	private String orderNumber;
 	@ManyToOne
 	@JoinColumn(name = "user_id")
 	private User user;

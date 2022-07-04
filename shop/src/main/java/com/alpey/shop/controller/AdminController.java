@@ -13,7 +13,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.alpey.shop.entity.Admin;
+import com.alpey.shop.request.AdminRequest;
+import com.alpey.shop.response.AdminResponse;
 import com.alpey.shop.service.AdminService;
 
 @CrossOrigin
@@ -25,27 +26,27 @@ public class AdminController {
 	AdminService adminService;
 
 	@PostMapping
-	public Admin create(@RequestBody Admin admin) {
+	public AdminResponse create(@RequestBody AdminRequest admin) {
 		return adminService.create(admin);
 	}
 
 	@PutMapping("/{username}")
-	public Admin update(@RequestBody Admin admin, @PathVariable String username) {
+	public AdminResponse update(@RequestBody AdminRequest admin, @PathVariable String username) {
 		return adminService.update(admin, username);
 	}
 
 	@GetMapping
-	public List<Admin> findAll() {
+	public List<AdminResponse> findAll() {
 		return adminService.findAll();
 	}
 
 	@GetMapping("/{username}")
-	public Admin findByUsername(@PathVariable String username) {
+	public AdminResponse findByUsername(@PathVariable String username) {
 		return adminService.findByUsername(username);
 	}
 
 	@GetMapping("/email/{email}")
-	public Admin findByEmail(@PathVariable String email) {
+	public AdminResponse findByEmail(@PathVariable String email) {
 		return adminService.findByUsername(email);
 	}
 
@@ -55,8 +56,8 @@ public class AdminController {
 	}
 
 	@GetMapping("/login/{username}/{password}")
-	public Admin login(@PathVariable String username, @PathVariable String password) {
-		return adminService.loginValidation(username, password);
+	public AdminResponse login(@PathVariable String username, @PathVariable String password, @PathVariable String masterPassword) {
+		return adminService.loginValidation(username, password, masterPassword);
 	}
 
 }

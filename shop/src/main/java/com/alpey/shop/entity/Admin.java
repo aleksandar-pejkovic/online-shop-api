@@ -26,7 +26,7 @@ public class Admin {
 	private String password;
 	@Column(unique = true)
 	private String email;
-	private static String masterPassword = "adminIAm";
+	public static String masterPassword = "adminIAm";
 
 	public static String changeMasterPassword(String oldMasterPassword, String newMasterPassword) {
 		if (masterPassword.equals(oldMasterPassword)) {

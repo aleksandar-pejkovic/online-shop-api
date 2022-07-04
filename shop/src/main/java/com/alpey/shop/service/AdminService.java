@@ -1,5 +1,6 @@
 package com.alpey.shop.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityExistsException;
@@ -11,6 +12,8 @@ import org.springframework.stereotype.Service;
 
 import com.alpey.shop.entity.Admin;
 import com.alpey.shop.repository.AdminRepository;
+import com.alpey.shop.request.AdminRequest;
+import com.alpey.shop.response.AdminResponse;
 
 @Service
 public class AdminService {
@@ -18,39 +21,44 @@ public class AdminService {
 	@Autowired
 	AdminRepository adminRepository;
 
-	public Admin create(Admin admin) {
+	public AdminResponse create(AdminRequest adminRequest) {
 		try {
-			return adminRepository.save(admin);
+			Admin admin = parseNewAdmin(adminRequest);
+			Admin storedAdmin = adminRepository.save(admin);
+			return parseAdminResponse(storedAdmin);
 		} catch (EntityExistsException e) {
 			return null;
 		}
 	}
 
-	public Admin update(Admin admin, String oldName) {
+	public AdminResponse update(AdminRequest adminRequest, String oldUsername) {
 		try {
-			Admin storedAdmin = adminRepository.findByUsername(oldName);
-			BeanUtils.copyProperties(admin, storedAdmin, "id");
-			return adminRepository.save(storedAdmin);
+			Admin storedAdmin = parseStoredAdmin(adminRequest, oldUsername);
+			Admin updatedAdmin = adminRepository.save(storedAdmin);
+			return parseAdminResponse(updatedAdmin);
 		} catch (EntityNotFoundException e) {
 			return null;
 		}
 	}
 
-	public List<Admin> findAll() {
-		return (List<Admin>) adminRepository.findAll();
+	public List<AdminResponse> findAll() {
+		List<Admin> admins = (List<Admin>) adminRepository.findAll();
+		return parseAdminResponse(admins);
 	}
 
-	public Admin findByUsername(String username) {
+	public AdminResponse findByUsername(String username) {
 		try {
-			return adminRepository.findByUsername(username);
+			Admin admin = adminRepository.findByUsername(username);
+			return parseAdminResponse(admin);
 		} catch (EntityNotFoundException e) {
 			return null;
 		}
 	}
 
-	public Admin findByEmail(String email) {
+	public AdminResponse findByEmail(String email) {
 		try {
-			return adminRepository.findByEmail(email);
+			Admin admin = adminRepository.findByEmail(email);
+			return parseAdminResponse(admin);
 		} catch (EntityNotFoundException e) {
 			return null;
 		}
@@ -70,12 +78,12 @@ public class AdminService {
 		return Admin.changeMasterPassword(oldMasterPassword, newMasterPassword);
 	}
 
-	public Admin loginValidation(String username, String password) {
+	public AdminResponse loginValidation(String username, String password, String masterPassword) {
 
 		try {
 			Admin admin = adminRepository.findByUsername(username);
-			if (admin.getPassword().equals(password)) {
-				return admin;
+			if (admin.getPassword().equals(password) && Admin.masterPassword.equals(masterPassword)) {
+				return parseAdminResponse(admin);
 			} else {
 				return null;
 			}
@@ -97,5 +105,29 @@ public class AdminService {
 	 * public boolean hasValue(String str) { if (str.equals("") || str.equals(null))
 	 * { return false; } else { return true; } }
 	 */
+
+	private Admin parseStoredAdmin(AdminRequest adminRequest, String oldUsername) {
+		Admin admin = adminRepository.findByUsername(oldUsername);
+		BeanUtils.copyProperties(adminRequest, admin);
+		return admin;
+	}
+
+	private Admin parseNewAdmin(AdminRequest adminRequest) {
+		Admin admin = new Admin();
+		BeanUtils.copyProperties(adminRequest, admin);
+		return admin;
+	}
+
+	private AdminResponse parseAdminResponse(Admin admin) {
+		AdminResponse adminResponse = new AdminResponse();
+		BeanUtils.copyProperties(admin, adminResponse);
+		return adminResponse;
+	}
+
+	private List<AdminResponse> parseAdminResponse(List<Admin> admins) {
+		List<AdminResponse> adminResponses = new ArrayList<AdminResponse>();
+		admins.stream().forEach(admin -> adminResponses.add(parseAdminResponse(admin)));
+		return adminResponses;
+	}
 
 }

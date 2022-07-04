@@ -1,4 +1,4 @@
-package com.alpey.shop.request;
+package com.alpey.shop.response;
 
 import java.time.LocalDate;
 
@@ -13,11 +13,15 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-public class OrderRequest {
+public class OrderResponse {
 
 	private String orderNumber;
-	private String username;
+	private String firstName;
+	private String lastName;
 	@JsonFormat(pattern = "dd.MM.yyyy.")
 	private LocalDate orderDate;
+	private double vat;
+	private double totalBeforeTax;
+	private double total;
 	
 }
