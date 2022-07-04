@@ -11,7 +11,7 @@ import lombok.Setter;
 @Setter
 public class ItemRequest {
 	
-	private long orderNumber;
+	private String orderNumber;
 	private double amount;
 	private String productName;
 

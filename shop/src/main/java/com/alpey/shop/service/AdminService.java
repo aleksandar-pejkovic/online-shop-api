@@ -23,21 +23,21 @@ public class AdminService {
 
 	public AdminResponse create(AdminRequest adminRequest) {
 		try {
-			Admin admin = parseNewAdmin(adminRequest);
+			Admin admin = parseAdmin(adminRequest);
 			Admin storedAdmin = adminRepository.save(admin);
 			return parseAdminResponse(storedAdmin);
-		} catch (EntityExistsException e) {
-			return null;
+		} catch (EntityExistsException | NullPointerException e) {
+			return new AdminResponse();
 		}
 	}
 
 	public AdminResponse update(AdminRequest adminRequest, String oldUsername) {
 		try {
-			Admin storedAdmin = parseStoredAdmin(adminRequest, oldUsername);
+			Admin storedAdmin = parseAdmin(adminRequest, oldUsername);
 			Admin updatedAdmin = adminRepository.save(storedAdmin);
 			return parseAdminResponse(updatedAdmin);
-		} catch (EntityNotFoundException e) {
-			return null;
+		} catch (EntityNotFoundException | NullPointerException e) {
+			return new AdminResponse();
 		}
 	}
 
@@ -50,8 +50,8 @@ public class AdminService {
 		try {
 			Admin admin = adminRepository.findByUsername(username);
 			return parseAdminResponse(admin);
-		} catch (EntityNotFoundException e) {
-			return null;
+		} catch (EntityNotFoundException | NullPointerException e) {
+			return new AdminResponse();
 		}
 	}
 
@@ -59,8 +59,8 @@ public class AdminService {
 		try {
 			Admin admin = adminRepository.findByEmail(email);
 			return parseAdminResponse(admin);
-		} catch (EntityNotFoundException e) {
-			return null;
+		} catch (EntityNotFoundException | NullPointerException e) {
+			return new AdminResponse();
 		}
 	}
 
@@ -69,13 +69,17 @@ public class AdminService {
 			Admin admin = adminRepository.findByUsername(username);
 			adminRepository.delete(admin);
 			return "Admin " + username + " deleted!";
-		} catch (EntityNotFoundException e) {
+		} catch (EntityNotFoundException | NullPointerException e) {
 			return "Admin " + username + " doesn't exist!";
 		}
 	}
 
 	public String changeMasterPassword(String oldMasterPassword, String newMasterPassword) {
-		return Admin.changeMasterPassword(oldMasterPassword, newMasterPassword);
+		try {
+			return Admin.changeMasterPassword(oldMasterPassword, newMasterPassword);
+		} catch (NullPointerException e) {
+			return "Input can't be null!";
+		}
 	}
 
 	public AdminResponse loginValidation(String username, String password, String masterPassword) {
@@ -85,10 +89,10 @@ public class AdminService {
 			if (admin.getPassword().equals(password) && Admin.masterPassword.equals(masterPassword)) {
 				return parseAdminResponse(admin);
 			} else {
-				return null;
+				return new AdminResponse();
 			}
-		} catch (EntityNotFoundException e) {
-			return null;
+		} catch (EntityNotFoundException | NullPointerException e) {
+			return new AdminResponse();
 		}
 	}
 
@@ -106,13 +110,13 @@ public class AdminService {
 	 * { return false; } else { return true; } }
 	 */
 
-	private Admin parseStoredAdmin(AdminRequest adminRequest, String oldUsername) {
+	private Admin parseAdmin(AdminRequest adminRequest, String oldUsername) {
 		Admin admin = adminRepository.findByUsername(oldUsername);
 		BeanUtils.copyProperties(adminRequest, admin);
 		return admin;
 	}
 
-	private Admin parseNewAdmin(AdminRequest adminRequest) {
+	private Admin parseAdmin(AdminRequest adminRequest) {
 		Admin admin = new Admin();
 		BeanUtils.copyProperties(adminRequest, admin);
 		return admin;

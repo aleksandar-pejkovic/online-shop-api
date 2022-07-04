@@ -11,6 +11,7 @@ import lombok.Setter;
 @Setter
 public class ItemResponse {
 	
+	private long id;
 	private double amount;
 	private String productName;
 	private double price;

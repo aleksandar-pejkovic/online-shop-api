@@ -13,7 +13,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.alpey.shop.entity.User;
+import com.alpey.shop.request.UserRequest;
+import com.alpey.shop.response.UserResponse;
 import com.alpey.shop.service.UserService;
 
 @CrossOrigin
@@ -25,32 +26,32 @@ public class UserController {
 	UserService userService;
 	
 	@PostMapping
-	public User create(@RequestBody User user) {
+	public UserResponse create(@RequestBody UserRequest user) {
 		return userService.create(user);
 	}
 	
 	@PutMapping("/{username}")
-	public User update(@RequestBody User user, @PathVariable String username) {
+	public UserResponse update(@RequestBody UserRequest user, @PathVariable String username) {
 		return userService.update(user, username);
 	}
 	
 	@GetMapping
-	public List<User> findAll(){
+	public List<UserResponse> findAll(){
 		return userService.findAll();
 	}
 	
 	@GetMapping("/{username}")
-	public User findByUsername(@PathVariable String username) {
+	public UserResponse findByUsername(@PathVariable String username) {
 		return userService.findByUsername(username);
 	}
 	
 	@GetMapping("/email/{email}")
-	public User findByEmail(@PathVariable String email) {
+	public UserResponse findByEmail(@PathVariable String email) {
 		return userService.findByUsername(email);
 	}
 	
 	@GetMapping("/phone/{phone}")
-	public User findByPhone(@PathVariable String phone) {
+	public UserResponse findByPhone(@PathVariable String phone) {
 		return userService.findByPhone(phone);
 	}
 	
@@ -60,7 +61,7 @@ public class UserController {
 	}
 	
 	@GetMapping("/login/{username}/{password}")
-	public User login(@PathVariable String username, @PathVariable String password) {
+	public UserResponse login(@PathVariable String username, @PathVariable String password) {
 		return userService.loginValidation(username, password);
 	}
 	

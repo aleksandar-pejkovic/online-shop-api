@@ -27,51 +27,45 @@ public class ItemService {
 
 	@Autowired
 	OrderRepository orderRepository;
-	
+
 	@Autowired
 	ProductRepository productRepository;
 
-	public Item create(ItemRequest itemRequest) {
+	public ItemResponse create(ItemRequest itemRequest) {
 		try {
-			Item item = new Item();
-			Product product = productRepository.findByName(itemRequest.getProductName());
-			Order order = orderRepository.findByOrderNumber(itemRequest.getOrderNumber());
-			BeanUtils.copyProperties(itemRequest, item);
-			item.setOrder(order);
-			item.setProduct(product);
-			item.calculateTotal();
-			order.addItem(item);
-			return itemRepository.save(item);
-		} catch (EntityExistsException e) {
-			return null;
+			Item item = parseItem(itemRequest);
+			Item storedItem = itemRepository.save(item);
+			return parseItemResponse(storedItem);
+		} catch (EntityExistsException | NullPointerException e) {
+			return new ItemResponse();
 		}
 	}
 
-	public Item update(Item item) {
-		try {
-			Item storedItem = itemRepository.findById(item.getId()).get();
-			return itemRepository.save(storedItem);
-		} catch (EntityNotFoundException e) {
-			return null;
-		}
-	}
+	/*
+	 * public Item update(Item item) { try { Item storedItem =
+	 * itemRepository.findById(item.getId()).get(); return
+	 * itemRepository.save(storedItem); } catch (EntityNotFoundException |
+	 * NullPointerException e) { return null; } }
+	 */
 
-	public List<ItemResponse> findByOrder(long orderNumber) {
+	public List<ItemResponse> findByOrder(String orderNumber) {
 		try {
 			Order order = orderRepository.findByOrderNumber(orderNumber);
 			List<Item> items = itemRepository.findByOrder(order);
-			return convertToResponse(items);
-		} catch (EntityNotFoundException e) {
-			return null;
+			return parseItemResponse(items);
+		} catch (EntityNotFoundException | NullPointerException e) {
+			return new ArrayList<ItemResponse>();
 		}
 	}
-
+	
 	public String delete(long id) {
 		try {
 			Item item = itemRepository.findById(id).get();
+			Order order = orderRepository.findByOrderNumber(item.getOrder().getOrderNumber());
+			order.removeItem(item);
 			itemRepository.delete(item);
 			return "Item deleted!";
-		} catch (EntityNotFoundException e) {
+		} catch (EntityNotFoundException | NullPointerException e) {
 			return "Item not found!";
 		}
 	}
@@ -90,19 +84,31 @@ public class ItemService {
 	 * private boolean hasValue(double num) { if (num <= 0) { return false; } else {
 	 * return true; } }
 	 */
-	
-	private ItemResponse convertToResponse(Item item) {
-		ItemResponse response = new ItemResponse();
-		BeanUtils.copyProperties(item, response);
-		response.setProductName(item.getProduct().getName());
-		response.setPrice(item.getProduct().getPrice());
-		return response;
+
+	private Item parseItem(ItemRequest itemRequest) {
+		Item item = new Item();
+		BeanUtils.copyProperties(itemRequest, item);
+		Order order = orderRepository.findByOrderNumber(itemRequest.getOrderNumber());
+		Product product = productRepository.findByName(itemRequest.getProductName());
+		item.setOrder(order);
+		item.setProduct(product);
+		item.calculateTotal();
+		order.addItem(item);
+		return item;
 	}
-	
-	private List<ItemResponse> convertToResponse(List<Item> items) {
-		List<ItemResponse> response = new ArrayList<ItemResponse>();
-		items.stream().forEach(item -> response.add(convertToResponse(item)));
-		return response;
+
+	private ItemResponse parseItemResponse(Item item) {
+		ItemResponse itemResponse = new ItemResponse();
+		BeanUtils.copyProperties(item, itemResponse);
+		itemResponse.setProductName(item.getProduct().getName());
+		itemResponse.setPrice(item.getProduct().getPrice());
+		return itemResponse;
+	}
+
+	private List<ItemResponse> parseItemResponse(List<Item> items) {
+		List<ItemResponse> itemResponse = new ArrayList<ItemResponse>();
+		items.stream().forEach(item -> itemResponse.add(parseItemResponse(item)));
+		return itemResponse;
 	}
 
 }

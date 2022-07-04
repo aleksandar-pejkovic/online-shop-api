@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 
 import com.alpey.shop.entity.Product;
 import com.alpey.shop.repository.ProductRepository;
+import com.alpey.shop.request.ProductRequest;
+import com.alpey.shop.response.ProductResponse;
 
 @Service
 public class ProductService {
@@ -20,38 +22,41 @@ public class ProductService {
 	@Autowired
 	ProductRepository productRepository;
 
-	public Product create(Product product) {
+	public ProductResponse create(ProductRequest productRequest) {
 		try {
-			product.calculateVAT();
-			return productRepository.save(product);
+			Product storedProduct = productRepository.save(parseProduct(productRequest));
+			return parseProductResponse(storedProduct);
 		} catch (EntityExistsException e) {
 			return null;
 		}
 	}
 
-	public Product update(Product product, String oldName) {
+	public ProductResponse update(ProductRequest productRequest, String oldName) {
 		try {
-			Product storedProduct = productRepository.findByName(oldName);
-			BeanUtils.copyProperties(product, storedProduct, "id");
-			return productRepository.save(storedProduct);
-		} catch (Exception e) {
-			return null;
+			Product storedProduct = parseProduct(productRequest, oldName);
+			BeanUtils.copyProperties(productRequest, storedProduct);
+			storedProduct = productRepository.save(storedProduct);
+			return parseProductResponse(storedProduct);
+		} catch (EntityNotFoundException | NullPointerException e) {
+			return new ProductResponse();
 		}
 	}
 
-	public Product findByName(String name) {
+	public ProductResponse findByName(String name) {
 		try {
-			return productRepository.findByName(name);
-		} catch (EntityNotFoundException e) {
-			return null;
+			Product product = productRepository.findByName(name);
+			return parseProductResponse(product);
+		} catch (EntityNotFoundException | NullPointerException e) {
+			return new ProductResponse();
 		}
 	}
 
-	public Product findByBarcode(String barcode) {
+	public ProductResponse findByBarcode(String barcode) {
 		try {
-			return productRepository.findByBarcode(barcode);
-		} catch (EntityNotFoundException e) {
-			return null;
+			Product product = productRepository.findByBarcode(barcode);
+			return parseProductResponse(product);
+		} catch (EntityNotFoundException | NullPointerException e) {
+			return new ProductResponse();
 		}
 	}
 
@@ -60,21 +65,26 @@ public class ProductService {
 	 * productRepository.findByPrice(price); }
 	 */
 
-	public List<Product> findAll() {
-		return (List<Product>) productRepository.findAll();
+	public List<ProductResponse> findAll() {
+		List<Product> products = (List<Product>) productRepository.findAll();
+		return parseProductResponse(products);
 	}
 
-	public List<Product> findByPrice(char operator, double price) {
-		List<Product> allProducts = findAll();
-		List<Product> shortlist = new ArrayList<Product>();
-		if (operator == '<') {
-			shortlist = allProducts.stream().filter(t -> t.getPrice() <= price).collect(Collectors.toList());
-		} else if (operator == '>') {
-			shortlist = allProducts.stream().filter(t -> t.getPrice() > price).collect(Collectors.toList());
-		} else {
-			shortlist = productRepository.findByPrice(price);
+	public List<ProductResponse> findByPrice(char operator, double price) {
+		try {
+			List<Product> allProducts = (List<Product>) productRepository.findAll();
+			List<Product> shortlist = new ArrayList<Product>();
+			if (operator == '<') {
+				shortlist = allProducts.stream().filter(t -> t.getPrice() <= price).collect(Collectors.toList());
+			} else if (operator == '>') {
+				shortlist = allProducts.stream().filter(t -> t.getPrice() > price).collect(Collectors.toList());
+			} else {
+				shortlist = productRepository.findByPrice(price);
+			}
+			return parseProductResponse(shortlist);
+		} catch (EntityNotFoundException | NullPointerException e) {
+			return new ArrayList<ProductResponse>();
 		}
-		return shortlist;
 	}
 
 	public String delete(String name) {
@@ -82,7 +92,7 @@ public class ProductService {
 			Product product = productRepository.findByName(name);
 			productRepository.delete(product);
 			return "Product " + name + " deleted!";
-		} catch (EntityNotFoundException e) {
+		} catch (EntityNotFoundException | NullPointerException e) {
 			return "Product " + name + " doesn't exist!";
 		}
 	}
@@ -104,5 +114,30 @@ public class ProductService {
 	 * private boolean hasValue(double num) { if (num <= 0) { return false; } else {
 	 * return true; } }
 	 */
+	
+	private Product parseProduct(ProductRequest productRequest) {
+		Product product = new Product();
+		BeanUtils.copyProperties(productRequest, product);
+		product.calculateVAT();
+		return product;
+	}
+	private Product parseProduct(ProductRequest productRequest, String oldName) {
+		Product product = productRepository.findByName(oldName);
+		BeanUtils.copyProperties(productRequest, product);
+		product.calculateVAT();
+		return product;
+	}
+	
+	private ProductResponse parseProductResponse(Product product) {
+		ProductResponse productResponse = new ProductResponse();
+		BeanUtils.copyProperties(product, productResponse);
+		return productResponse;
+	}
+	
+	private List<ProductResponse> parseProductResponse(List<Product> products) {
+		List<ProductResponse> productResponses = new ArrayList<ProductResponse>();
+		products.stream().forEach(product -> productResponses.add(parseProductResponse(product)));
+		return productResponses;
+	}
 
 }

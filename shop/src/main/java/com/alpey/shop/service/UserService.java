@@ -1,5 +1,6 @@
 package com.alpey.shop.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityExistsException;
@@ -11,64 +12,73 @@ import org.springframework.stereotype.Service;
 
 import com.alpey.shop.entity.User;
 import com.alpey.shop.repository.UserRepository;
+import com.alpey.shop.request.UserRequest;
+import com.alpey.shop.response.UserResponse;
 
 @Service
 public class UserService {
 
 	@Autowired
 	UserRepository userRepository;
-	
-	public User create(User user) {
+
+	public UserResponse create(UserRequest userRequest) {
 		try {
-			return userRepository.save(user);
-		} catch (EntityExistsException e) {
-			return null;
+			User user = parseUser(userRequest);
+			User storedUser = userRepository.save(user);
+			return parseUserResponse(storedUser);
+		} catch (EntityExistsException | NullPointerException e) {
+			return new UserResponse();
 		}
 	}
 
-	public User update(User user, String oldName) {
+	public UserResponse update(UserRequest user, String oldName) {
 		try {
-			User storedUser = userRepository.findByUsername(oldName);
-			BeanUtils.copyProperties(user, storedUser, "id");
-			return userRepository.save(storedUser);
-		} catch (EntityNotFoundException e) {
-			return null;
+			User storedUser = parseUser(user, oldName);
+			storedUser = userRepository.save(storedUser);
+			return parseUserResponse(storedUser);
+		} catch (EntityNotFoundException | NullPointerException e) {
+			return new UserResponse();
 		}
 	}
 
-	public List<User> findAll() {
-		return (List<User>) userRepository.findAll();
+	public List<UserResponse> findAll() {
+		List<User> users = (List<User>) userRepository.findAll();
+		return parseUserResponse(users);
 	}
 
-	public User findByUsername(String username) {
+	public UserResponse findByUsername(String username) {
 		try {
-			return userRepository.findByUsername(username);
-		} catch (EntityNotFoundException e) {
-			return null;
+			User user = userRepository.findByUsername(username);
+			return parseUserResponse(user);
+		} catch (EntityNotFoundException | NullPointerException e) {
+			return new UserResponse();
 		}
 	}
 
-	public User findByEmail(String email) {
+	public UserResponse findByEmail(String email) {
 		try {
-			return userRepository.findByEmail(email);
-		} catch (EntityNotFoundException e) {
-			return null;
+			User user = userRepository.findByEmail(email);
+			return parseUserResponse(user);
+		} catch (EntityNotFoundException | NullPointerException e) {
+			return new UserResponse();
 		}
 	}
-	
-	public List<User> findByCity(String city) {
+
+	public List<UserResponse> findByCity(String city) {
 		try {
-			return userRepository.findByCity(city);
-		} catch (EntityNotFoundException e) {
-			return null;
+			List<User> users = userRepository.findByCity(city);
+			return parseUserResponse(users);
+		} catch (EntityNotFoundException | NullPointerException e) {
+			return new ArrayList<UserResponse>();
 		}
 	}
-	
-	public User findByPhone(String phone) {
+
+	public UserResponse findByPhone(String phone) {
 		try {
-			return userRepository.findByPhone(phone);
-		} catch (EntityNotFoundException e) {
-			return null;
+			User user = userRepository.findByPhone(phone);
+			return parseUserResponse(user);
+		} catch (EntityNotFoundException | NullPointerException e) {
+			return new UserResponse();
 		}
 	}
 
@@ -77,48 +87,61 @@ public class UserService {
 			User user = userRepository.findByUsername(username);
 			userRepository.delete(user);
 			return "User " + username + " deleted!";
-		} catch (EntityNotFoundException e) {
+		} catch (EntityNotFoundException | NullPointerException e) {
 			return "User " + username + " doesn't exist!";
 		}
 	}
 
-	public User loginValidation(String username, String password) {
-		
+	public UserResponse loginValidation(String username, String password) {
+
 		try {
-			User user = findByUsername(username);
+			User user = userRepository.findByUsername(username);
 			if (user.getPassword().equals(password)) {
-				return user;
+				return parseUserResponse(user);
 			} else {
-				return null;
+				return new UserResponse();
 			}
-		} catch (EntityNotFoundException e) {
-			return null;
+		} catch (EntityNotFoundException | NullPointerException e) {
+			return new UserResponse();
 		}
 	}
-	
+
 	/*
-	public User copyNotNullProperties(User src, User dest) {
-		String username = src.getUsername();
-		String password = src.getPassword();
-		String email = src.getEmail();
-		
-		if(hasValue(username))
-			dest.setUsername(username);
-		if(hasValue(password))
-			dest.setPassword(password);
-		if(hasValue(email))
-			dest.setEmail(email);
-		
-		return dest;
+	 * public User copyNotNullProperties(User src, User dest) { String username =
+	 * src.getUsername(); String password = src.getPassword(); String email =
+	 * src.getEmail();
+	 * 
+	 * if(hasValue(username)) dest.setUsername(username); if(hasValue(password))
+	 * dest.setPassword(password); if(hasValue(email)) dest.setEmail(email);
+	 * 
+	 * return dest; }
+	 * 
+	 * public boolean hasValue(String str) { if(str.equals("") || str.equals(null))
+	 * { return false; } else { return true; } }
+	 */
+
+	private User parseUser(UserRequest userRequest) {
+		User user = new User();
+		BeanUtils.copyProperties(userRequest, user);
+		return user;
 	}
-	
-	public boolean hasValue(String str) {
-		if(str.equals("") || str.equals(null)) {
-			return false;
-		} else {
-			return true;
-		}
+
+	private User parseUser(UserRequest userRequest, String oldUsername) {
+		User storedUser = userRepository.findByUsername(oldUsername);
+		BeanUtils.copyProperties(oldUsername, storedUser);
+		return storedUser;
 	}
-	*/
-	
+
+	private UserResponse parseUserResponse(User user) {
+		UserResponse userResponse = new UserResponse();
+		BeanUtils.copyProperties(user, userResponse);
+		return userResponse;
+	}
+
+	private List<UserResponse> parseUserResponse(List<User> users) {
+		List<UserResponse> userResponses = new ArrayList<UserResponse>();
+		users.stream().forEach(user -> userResponses.add(parseUserResponse(user)));
+		return userResponses;
+	}
+
 }

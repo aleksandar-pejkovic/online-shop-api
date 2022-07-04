@@ -12,7 +12,7 @@ import com.alpey.shop.entity.User;
 @Repository
 public interface OrderRepository extends CrudRepository<Order, Long> {
 	
-	public Order findByOrderNumber(long orderNumber);
+	public Order findByOrderNumber(String orderNumber);
 	public List<Order> findByUser(User user);
 	public List<Order> findByOrderDate(LocalDate orderDate);
 
