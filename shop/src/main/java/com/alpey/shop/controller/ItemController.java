@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.alpey.shop.entity.Item;
+import com.alpey.shop.request.ItemRequest;
+import com.alpey.shop.response.ItemResponse;
 import com.alpey.shop.service.ItemService;
 
 @CrossOrigin
@@ -24,7 +26,7 @@ public class ItemController {
 	ItemService itemService;
 
 	@PostMapping
-	public Item create(@RequestBody Item item) {
+	public Item create(@RequestBody ItemRequest item) {
 		return itemService.create(item);
 	}
 	
@@ -34,7 +36,7 @@ public class ItemController {
 	}
 	
 	@GetMapping("/{orderNumber}")
-	public List<Item> findByOrder(@PathVariable long orderNumber) {
+	public List<ItemResponse> findByOrder(@PathVariable long orderNumber) {
 		return itemService.findByOrder(orderNumber);
 	}
 	

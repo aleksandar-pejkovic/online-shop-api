@@ -22,6 +22,7 @@ public class ProductService {
 
 	public Product create(Product product) {
 		try {
+			product.calculateVAT();
 			return productRepository.save(product);
 		} catch (EntityExistsException e) {
 			return null;

@@ -34,6 +34,11 @@ public class ProductController {
 		return productService.update(product, name);
 	}
 	
+	@GetMapping
+	public List<Product> findAll() {
+		return productService.findAll();
+	}
+	
 	@GetMapping("/{name}")
 	public Product findByName(@PathVariable String name) {
 		return productService.findByName(name);

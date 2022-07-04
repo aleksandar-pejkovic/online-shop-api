@@ -49,7 +49,12 @@ public class UserController {
 		return userService.findByUsername(email);
 	}
 	
-	@DeleteMapping
+	@GetMapping("/phone/{phone}")
+	public User findByPhone(@PathVariable String phone) {
+		return userService.findByPhone(phone);
+	}
+	
+	@DeleteMapping("/{username}")
 	public String delete(@PathVariable String username) {
 		return userService.delete(username);
 	}

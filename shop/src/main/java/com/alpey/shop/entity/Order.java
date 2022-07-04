@@ -41,26 +41,21 @@ public class Order {
 	@JsonIgnore
 	@OneToMany(mappedBy = "order")
 	private List<Item> items;
-	private double vat = 0;
-	private double totalBeforeTax = 0;
-	private double total = 0;
+	private double vat;
+	private double totalBeforeTax;
+	private double total;
 	
 	public List<Item> addItem(Item item){
 		this.items.add(item);
+		this.total += item.getTotal();
+		this.vat += item.getVat();
+		this.totalBeforeTax += item.getTotalBeforeTax();
 		return this.items;
 	}
 	
 	public List<Item> removeItem(Item item){
 		this.items.remove(item);
 		return this.items;
-	}
-	
-	public double calculateTotal() {
-			items.forEach(e -> {this.total += e.getTotal();
-								this.vat += e.getVat();
-								this.totalBeforeTax += e.getTotalBeforeTax();
-					});
-			return this.total;
 	}
 
 }

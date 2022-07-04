@@ -49,7 +49,7 @@ public class AdminController {
 		return adminService.findByUsername(email);
 	}
 
-	@DeleteMapping
+	@DeleteMapping("/{username}")
 	public String delete(@PathVariable String username) {
 		return adminService.delete(username);
 	}

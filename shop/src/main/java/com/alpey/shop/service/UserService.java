@@ -63,6 +63,14 @@ public class UserService {
 			return null;
 		}
 	}
+	
+	public User findByPhone(String phone) {
+		try {
+			return userRepository.findByPhone(phone);
+		} catch (EntityNotFoundException e) {
+			return null;
+		}
+	}
 
 	public String delete(String username) {
 		try {

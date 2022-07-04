@@ -14,6 +14,7 @@ import com.alpey.shop.entity.Order;
 import com.alpey.shop.entity.User;
 import com.alpey.shop.repository.OrderRepository;
 import com.alpey.shop.repository.UserRepository;
+import com.alpey.shop.request.OrderRequest;
 
 @Service
 public class OrderService {
@@ -24,8 +25,12 @@ public class OrderService {
 	@Autowired
 	UserRepository userRepository;
 	
-	public Order create(Order order) {
+	public Order create(OrderRequest orderRequest) {
 		try {
+			User user = userRepository.findByUsername(orderRequest.getUsername());
+			Order order = new Order();
+			BeanUtils.copyProperties(orderRequest, order);
+			order.setUser(user);
 			return orderRepository.save(order);
 		} catch (EntityExistsException e) {
 			return null;

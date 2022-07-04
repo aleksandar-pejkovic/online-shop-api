@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.alpey.shop.entity.Order;
+import com.alpey.shop.request.OrderRequest;
 import com.alpey.shop.service.OrderService;
 
 @CrossOrigin
@@ -26,7 +27,7 @@ public class OrderController {
 	OrderService orderService;
 	
 	@PostMapping
-	public Order create(@RequestBody Order order) {
+	public Order create(@RequestBody OrderRequest order) {
 		return orderService.create(order);
 	}
 	

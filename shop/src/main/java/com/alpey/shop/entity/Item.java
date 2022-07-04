@@ -40,10 +40,10 @@ public class Item {
 		calculateTotal();
 	}
 
-	public double calculateTotal() {
+	public void calculateTotal() {
 		this.vat = Math.round(this.amount * this.product.getVat() * 100.0 / 100.0);
 		this.totalBeforeTax = Math.round(this.amount * this.product.getPriceBeforeTax() * 100.0 / 100.0);
-		return this.total = Math.round(this.amount * this.product.getPrice() * 100.0 / 100.0);
+		this.total = Math.round(this.amount * this.product.getPrice() * 100.0 / 100.0);
 	}
 
 }
